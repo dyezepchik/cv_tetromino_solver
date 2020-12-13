@@ -2,6 +2,7 @@
 
 import argparse
 import typing
+from collections import deque
 
 # Define the shapes of the single parts (no need for mirrored ones) 4x4
 # tetromino_shapes = {
@@ -49,13 +50,16 @@ def rotate(tile_def: [[str]], rotation):
 class TetrominoSolver:
 
     def __init__(self, tiles: [str], board_x: int, board_y: int):
-        self.board = ["."] * board_x * board_y
+        # given
         self.tiles = tiles
         self.board_x = board_x
         self.board_y = board_y
+        # for solution
+        self.board = ["."] * board_x * board_y
+        self.solution = deque()  # used as stack
+        self.remaining_tiles = deque()  # used as circular buffer
 
-    @property
-    def solution(self):
+    def draw_solution(self):
         res = ""
         offset = 0
         while line:=self.board[offset:offset+self.board_x]:
@@ -63,9 +67,15 @@ class TetrominoSolver:
             offset += self.board_x
         return res
 
-    def tile_fits(tile: str, rotation: int, position_x: int, position_y: int):
+    def tile_fits(self, tile: str, rotation: int, position_x: int, position_y: int):
+        pass
 
     def solve(self):
+        """
+        1. find the first vacant cell on the board (starting from upper left corner)
+        2. Try to fit unfitted tiles onto the board starting from that cell
+        3. If none fit - step back
+        """
         solution_found = False
         while not solution_found:
             for tile in self.tiles:
