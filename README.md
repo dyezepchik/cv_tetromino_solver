@@ -8,3 +8,6 @@ $ python opencv_detect_shapes.py
 To be done:
 - detecting a shape in tetromino terms
 - tetromino solving algorithm
+
+Tests:
+Simply run pytest

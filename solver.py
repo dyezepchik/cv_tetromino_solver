@@ -13,23 +13,23 @@ from collections import deque
 #     "T": "..X..XX...X.....",
 # }
 # Alternative shapes definitions
-tetromino_shapes = {
-    'I': [['I', 'I', 'I', 'I']],
-    'Z': [['Z', 'Z', '.']
-          ['.', 'Z', 'Z']],
-    'S': [['.', 'S', 'S']
-          ['S', 'S', '.']],
-    'O': [['O', 'O'],
-          ['O', 'O']],
-    'L': [['L', 'L', 'L'],
-          ['L', '.', '.']],
-    'J': [['J', '.', '.'],
-          ['J', 'J', 'J']],
-    'T': [['T', 'T', 'T'],
-          ['.', 'T', '.']],
+TETROMINO_SHAPES = {
+    'I': (('I', 'I', 'I', 'I'), ),
+    'Z': (('Z', 'Z', '.'),
+          ('.', 'Z', 'Z')),
+    'S': (('.', 'S', 'S'),
+          ('S', 'S', '.')),
+    'O': (('O', 'O'),
+          ('O', 'O')),
+    'L': (('L', 'L', 'L'),
+          ('L', '.', '.')),
+    'J': (('J', '.', '.'),
+          ('J', 'J', 'J')),
+    'T': (('T', 'T', 'T'),
+          ('.', 'T', '.')),
 }
 
-def rotate_clockwise(matrx: [[str]]):
+def rotate_clockwise(matrix: [[str]]):
     return [list(reversed(col)) for col in zip(*matrix)]
 
 def rotate(tile_def: [[str]], rotation):
@@ -55,7 +55,7 @@ class TetrominoSolver:
         self.board_x = board_x
         self.board_y = board_y
         # for solution
-        self.board = ["."] * board_x * board_y
+        self.board = ['.'] * board_x * board_y
         self.solution = deque()  # used as stack
         self.remaining_tiles = deque()  # used as circular buffer
 
@@ -68,7 +68,21 @@ class TetrominoSolver:
         return res
 
     def tile_fits(self, tile: str, rotation: int, position_x: int, position_y: int):
-        pass
+        tile_rotated = rotate(TETROMINO_SHAPES[tile], rotation)
+        for y, line in enumerate(tile_rotated):
+            for x, val in enumerate(line):
+                if position_x + x < 0 or position_x + x >= self.board_x:
+                    return False
+
+                if position_y + y < 0 or position_y + y >= self.board_y:
+                    return False
+
+                board_idx = (position_y + y) * self.board_x + (position_x + x)
+
+                if val != '.' and self.board[board_idx] != '.':
+                    return False
+
+        return True
 
     def solve(self):
         """
