@@ -84,19 +84,56 @@ class TetrominoSolver:
 
         return True
 
+    def add_tile(self, tile, rotation, position):
+        tile_rotated = rotate(TETROMINO_SHAPES[tile], rotation)
+        for y, line in enumerate(tile_rotated):
+            for x, val in enumerate(line):
+                board_idx = (position_y + y) * self.board_x + (position_x + x)
+                self.board[board_idx] = tile
+
+    def rem_tile(self, tile, rotation, position):
+        tile_rotated = rotate(TETROMINO_SHAPES[tile], rotation)
+        for y, line in enumerate(tile_rotated):
+            for x, val in enumerate(line):
+                board_idx = (position_y + y) * self.board_x + (position_x + x)
+                self.board[board_idx] = '.'
+
+    def _solve(self, board, tiles):
+        print(board, tiles)
+        # find first empty cell on the board
+        index = None
+        for i, cell in enumerate(board):
+            if cell == '.':
+                index = i
+
+        if index is None:
+            return  # Problem solved
+            # raise RuntimeError("Something went wrong. No empty cells on the board.")
+
+        for i, tile in enumerate(tiles):
+            for rotation in range(4):
+                if self.tile_fits(tile, rotation, index // self.board_x, index % self.board_x):
+                    # add to the board, add to solution, call recursively
+                    self.add_tile(tile, rotation, index)
+                    self.solution.append((tile, rotation))
+                    res = self._solve(board, tiles[:i]+tiles[i+1:])
+                    if res == -1:
+                        self.rem_tile(tile, rotation, index)
+                        self.solution.pop()
+                        continue
+
+                    return
+
+        return -1  # remove previous tile
+
     def solve(self):
-        """
-        1. find the first vacant cell on the board (starting from upper left corner)
-        2. Try to fit unfitted tiles onto the board starting from that cell
-        3. If none fit - step back
-        """
-        solution_found = False
-        while not solution_found:
-            for tile in self.tiles:
-                pass
+        res = self._solve(self.board, self.tiles)
+        if res == -1:
+            raise RuntimeError("No solution found.")
 
 
 if __name__ == "__main__":
+    "Sample run: ./solver.py O O O O --board-x 4 --board-y 4"
     parser = argparse.ArgumentParser(description='For testing from command line.')
     parser.add_argument('tiles', metavar='N', type=str, nargs='+', help='array of tiles')
     parser.add_argument('--board-x', help='Board size X')
@@ -105,5 +142,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     tetromino = TetrominoSolver(args.tiles, int(args.board_x), int(args.board_y))
-
+    tetromino.solve()
     print(tetromino.solution)
+
