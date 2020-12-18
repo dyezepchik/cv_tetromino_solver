@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+""" Notes for algo:
+ - no need to rotate O
+ - I - only two possible rotations
+ - add non-recursive solution
+ - add optimized solution
+ - 
+"""
+
 import argparse
 import typing
 from collections import deque
@@ -84,14 +92,14 @@ class TetrominoSolver:
 
         return True
 
-    def add_tile(self, tile, rotation, position):
+    def add_tile(self, tile, rotation, position_x: int, position_y: int):
         tile_rotated = rotate(TETROMINO_SHAPES[tile], rotation)
         for y, line in enumerate(tile_rotated):
             for x, val in enumerate(line):
                 board_idx = (position_y + y) * self.board_x + (position_x + x)
                 self.board[board_idx] = tile
 
-    def rem_tile(self, tile, rotation, position):
+    def rem_tile(self, tile, rotation, position_x: int, position_y: int):
         tile_rotated = rotate(TETROMINO_SHAPES[tile], rotation)
         for y, line in enumerate(tile_rotated):
             for x, val in enumerate(line):
@@ -99,26 +107,31 @@ class TetrominoSolver:
                 self.board[board_idx] = '.'
 
     def _solve(self, board, tiles):
-        print(board, tiles)
+        # print(self.draw_solution())
+        # print(tiles)
+        # import ipdb
+        # ipdb.set_trace()
         # find first empty cell on the board
         index = None
         for i, cell in enumerate(board):
             if cell == '.':
                 index = i
+                break
 
         if index is None:
             return  # Problem solved
             # raise RuntimeError("Something went wrong. No empty cells on the board.")
 
+        cell_y, cell_x = index // self.board_x, index % self.board_x
         for i, tile in enumerate(tiles):
             for rotation in range(4):
-                if self.tile_fits(tile, rotation, index // self.board_x, index % self.board_x):
+                if self.tile_fits(tile, rotation, cell_x, cell_y):
                     # add to the board, add to solution, call recursively
-                    self.add_tile(tile, rotation, index)
-                    self.solution.append((tile, rotation))
+                    self.add_tile(tile, rotation, cell_x, cell_y)
+                    self.solution.append((index, tile, rotation))
                     res = self._solve(board, tiles[:i]+tiles[i+1:])
                     if res == -1:
-                        self.rem_tile(tile, rotation, index)
+                        self.rem_tile(tile, rotation, cell_x, cell_y)
                         self.solution.pop()
                         continue
 
