@@ -56,7 +56,6 @@ def test_add_tile_non_empty_board(tiles, expected):
     for tile_params in tiles:
         tile, rotation, pos_x, pos_y = tile_params
         s.add_tile(tile, rotation, pos_x, pos_y)
-        print(s.draw_board())
     assert s.board == expected
 
 
@@ -102,7 +101,9 @@ def test_tile_fits_clean_board_pos_0(tile, rotation, board_x, board_y, fits):
         (['L', 'L', 'S'], 4, 3, "exists"),
         (['S', 'L', 'L'], 4, 3, "exists"),
         (['L', 'S', 'L'], 4, 3, "exists"),
-        # (['T', 'L', 'S', 'T', 'I'], 5, 4, "exists"),
+        (['T', 'L', 'S', 'T', 'I'], 5, 4, "exists"),
+        (['L', 'T', 'T', 'S', 'I'], 5, 4, "exists"),
+        (['I', 'T', 'L', 'S', 'T'], 5, 4, "exists"),
     ],
 )
 def test_solve(tiles, board_x, board_y, solution):

@@ -42,15 +42,7 @@ T I I I I
 T T T T T
 T S S T L
 S S L L L
-
-pipenv run ./solver.py L L S --board-x 4 --board-y 3
-L L L L
-L S S L
-S S L L
-
-L S L L
-L S S L
-L L S L
+deque([(0, 'L', 3), (1, 'S', 1), (8, 'T', 1), (2, 'T', 0), (15, 'I', 0)])
 """
 def rotate_clockwise(matrix: [[str]]):
     return [list(reversed(col)) for col in zip(*matrix)]
@@ -124,32 +116,36 @@ class TetrominoSolver:
                     self.board[board_idx] = '.'
 
     def _solve(self, board, tiles):
+        # print(self.draw_board())
         # find first empty cell on the board at the moment
         index = None
         for i, cell in enumerate(board):
             if cell == '.':
                 index = i
-                break
+            else:
+                continue
+
+            cell_y, cell_x = index // self.board_x, index % self.board_x
+            for i, tile in enumerate(tiles):
+                for rotation in range(4):
+                    if self.tile_fits(tile, rotation, cell_x, cell_y):
+                        # add to the board, add to solution, call recursively
+                        self.add_tile(tile, rotation, cell_x, cell_y)
+                        self.solution.append((index, tile, rotation))
+                        res = self._solve(board, tiles[:i]+tiles[i+1:])
+                        if res == -1:
+                            self.rem_tile(tile, rotation, cell_x, cell_y)
+                            self.solution.pop()
+                            continue
+
+                        return
 
         if index is None:
             return  # Problem solved
             # raise RuntimeError("Something went wrong. No empty cells on the board.")
 
-        cell_y, cell_x = index // self.board_x, index % self.board_x
-        for i, tile in enumerate(tiles):
-            for rotation in range(4):
-                if self.tile_fits(tile, rotation, cell_x, cell_y):
-                    # add to the board, add to solution, call recursively
-                    self.add_tile(tile, rotation, cell_x, cell_y)
-                    self.solution.append((index, tile, rotation))
-                    res = self._solve(board, tiles[:i]+tiles[i+1:])
-                    if res == -1:
-                        self.rem_tile(tile, rotation, cell_x, cell_y)
-                        self.solution.pop()
-                        continue
-
-                    return
-
+        # # if no solution found for board cell 'index', try vacant neighbour cells
+        # for cell in 
         return -1  # remove previous tile
 
     def solve(self):
