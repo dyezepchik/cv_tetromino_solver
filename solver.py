@@ -36,7 +36,22 @@ TETROMINO_SHAPES = {
     'T': (('T', 'T', 'T'),
           ('.', 'T', '.')),
 }
+"""
+pipenv run ./solver.py T L S T I  --board-x 5 --board-y 4
+T I I I I
+T T T T T
+T S S T L
+S S L L L
 
+pipenv run ./solver.py L L S --board-x 4 --board-y 3
+L L L L
+L S S L
+S S L L
+
+L S L L
+L S S L
+L L S L
+"""
 def rotate_clockwise(matrix: [[str]]):
     return [list(reversed(col)) for col in zip(*matrix)]
 
@@ -67,13 +82,13 @@ class TetrominoSolver:
         self.solution = deque()  # used as stack
         self.remaining_tiles = deque()  # used as circular buffer
 
-    def draw_solution(self):
+    def draw_board(self):
         res = ""
         offset = 0
         while line:=self.board[offset:offset+self.board_x]:
             res += "".join(line) + "\n"
             offset += self.board_x
-        return res
+        return "\n" + res
 
     def tile_fits(self, tile: str, rotation: int, position_x: int, position_y: int):
         tile_rotated = rotate(TETROMINO_SHAPES[tile], rotation)
@@ -97,21 +112,19 @@ class TetrominoSolver:
         for y, line in enumerate(tile_rotated):
             for x, val in enumerate(line):
                 board_idx = (position_y + y) * self.board_x + (position_x + x)
-                self.board[board_idx] = tile
+                if val == tile:
+                    self.board[board_idx] = val
 
     def rem_tile(self, tile, rotation, position_x: int, position_y: int):
         tile_rotated = rotate(TETROMINO_SHAPES[tile], rotation)
         for y, line in enumerate(tile_rotated):
             for x, val in enumerate(line):
                 board_idx = (position_y + y) * self.board_x + (position_x + x)
-                self.board[board_idx] = '.'
+                if val == tile:
+                    self.board[board_idx] = '.'
 
     def _solve(self, board, tiles):
-        # print(self.draw_solution())
-        # print(tiles)
-        # import ipdb
-        # ipdb.set_trace()
-        # find first empty cell on the board
+        # find first empty cell on the board at the moment
         index = None
         for i, cell in enumerate(board):
             if cell == '.':
