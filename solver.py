@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
-""" Notes for algo:
+""" 
+Running example:
+pipenv run ./solver.py T L S T I  --board-x 5 --board-y 4
+
+Notes for algo:
  - no need to rotate O
  - I - only two possible rotations
  - add non-recursive solution
@@ -27,23 +31,23 @@ TETROMINO_SHAPES = {
           ('.', 'Z', 'Z')),
     'S': (('.', 'S', 'S'),
           ('S', 'S', '.')),
-    'O': (('O', 'O'),
-          ('O', 'O')),
+    'o': (('o', 'o'),
+          ('o', 'o')),
+    'l': (('l', 'l'),
+          ('l', '.')),
+    'j': (('j', 'j'),
+          ('j', '.')),
+    'i': (('i', 'i'), ),
     'L': (('L', 'L', 'L'),
           ('L', '.', '.')),
     'J': (('J', '.', '.'),
           ('J', 'J', 'J')),
     'T': (('T', 'T', 'T'),
           ('.', 'T', '.')),
+    'C': (('C', 'C', 'C'),
+          ('C', '.', 'C')),
 }
-"""
-pipenv run ./solver.py T L S T I  --board-x 5 --board-y 4
-T I I I I
-T T T T T
-T S S T L
-S S L L L
-deque([(0, 'L', 3), (1, 'S', 1), (8, 'T', 1), (2, 'T', 0), (15, 'I', 0)])
-"""
+
 def rotate_clockwise(matrix: [[str]]):
     return [list(reversed(col)) for col in zip(*matrix)]
 
