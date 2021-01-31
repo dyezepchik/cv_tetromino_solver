@@ -78,7 +78,7 @@ class TetrominoSolver:
         self.solution = deque()  # used as stack
         self.remaining_tiles = deque()  # used as circular buffer
 
-    def draw_board(self):
+    def board_to_text(self):
         res = ""
         offset = 0
         while line:=self.board[offset:offset+self.board_x]:
@@ -120,7 +120,7 @@ class TetrominoSolver:
                     self.board[board_idx] = '.'
 
     def _solve(self, board, tiles):
-        # print(self.draw_board())
+        # print(self.board_to_text())
         # find first empty cell on the board at the moment
         index = None
         for i, cell in enumerate(board):
@@ -169,5 +169,6 @@ if __name__ == "__main__":
 
     tetromino = TetrominoSolver(args.tiles, int(args.board_x), int(args.board_y))
     tetromino.solve()
+    print(tetromino.board_to_text())
     print(tetromino.solution)
 
